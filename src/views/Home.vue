@@ -14,5 +14,9 @@ export default {
   components: {
     HelloWorld,
   },
+  created() {
+    // 環境變數
+    // console.log(process.env.VUE_APP_API, process.env.VUE_APP_PATH);
+  },
 };
 </script>
