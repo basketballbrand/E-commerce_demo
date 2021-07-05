@@ -62,7 +62,14 @@
               </td>
               <td>
                 <ul>
-                  <li>$ {{ $filters.currency(item.total) }}</li>
+                  <li
+                    :class="{
+                      'text-decoration-line-through':
+                        cartlist.final_total !== cartlist.total,
+                    }"
+                  >
+                    $ {{ $filters.currency(item.total) }}
+                  </li>
                   <li>
                     <div
                       class="text-success"
@@ -114,7 +121,11 @@
         <h5>訂單資訊</h5>
         <p><i class="bi bi-truck"></i>單筆滿 $2000 享免運。</p>
         <ul>
-          <li>
+          <li v-if="cartlist.final_total == cartlist.total">
+            <span class="title">小計：</span
+            ><span class="price">NT$ {{ cartlist.total }}</span>
+          </li>
+          <li class="text-success" v-else>
             <span class="title">小計：</span
             ><span class="price">NT$ {{ cartlist.final_total }}</span>
           </li>
@@ -143,7 +154,9 @@
                 輸入
               </button>
             </div>
-            <p class="coupons_code">輸入 <span class="text-success">coupons</span> 將享有五折的優惠</p>
+            <p class="coupons_code">
+              輸入 <span class="text-success">coupons</span> 將享有五折的優惠
+            </p>
           </li>
         </ul>
         <hr />
@@ -315,7 +328,14 @@
               <td>{{ item.product.title }}</td>
               <td>{{ item.qty }}/{{ item.product.unit }}</td>
               <td>
-                {{ item.total }}
+                <div
+                  :class="{
+                    'text-decoration-line-through':
+                      cartlist.final_total !== cartlist.total,
+                  }"
+                >
+                  $ {{ item.total }}
+                </div>
                 <div
                   class="text-success"
                   v-if="item.final_total !== item.total"
@@ -434,6 +454,7 @@ export default {
         this.isLoading = false;
         this.cartlist = res.data.data;
         this.emitter.emit("sendcartlist", res.data.data);
+        console.log(this.cartlist);
       });
     },
     //刪除單筆資料
@@ -483,7 +504,7 @@ export default {
       this.isLoading = true;
       this.$http.get(api).then((res) => {
         this.isLoading = false;
-        console.log(res);
+        // console.log(res);
         if (res.data.success) {
           this.order = res.data.order;
         }
@@ -498,8 +519,10 @@ export default {
       this.isLoading = true;
       this.$http.post(api, { data: coupon }).then((res) => {
         this.isLoading = false;
-        console.log(res.data);
-        this.getcartlist();
+        // console.log(res.data);
+        if (res.data.success) {
+          this.getcartlist();
+        }
       });
     },
     // 付錢
@@ -596,9 +619,9 @@ img {
     width: 35%;
   }
 }
-.coupons_code{
-  font-size:14px;
-  span{
+.coupons_code {
+  font-size: 14px;
+  span {
     font-weight: bolder;
   }
 }
